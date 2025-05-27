@@ -3,11 +3,12 @@ import { ThemeProvider } from './components/ui/theme-provider'
 import { Chat } from './components/chat/Chat'
 import { EnhancedChat } from './components/chat/EnhancedChat'
 import { VercelEnhancedChat } from './components/chat/VercelEnhancedChat'
-import { motion } from 'framer-motion'
+import { CodeInterpreterUI } from './components/code-interpreter/CodeInterpreterUI'
+import { motion } from './lib/animation-utils'
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false)
-  const [chatMode, setChatMode] = useState<'basic' | 'enhanced' | 'vercel'>('vercel')
+  const [chatMode, setChatMode] = useState<'basic' | 'enhanced' | 'vercel' | 'interpreter'>('vercel')
 
   return (
     <ThemeProvider defaultTheme={isDarkMode ? 'dark' : 'light'}>
@@ -35,13 +36,14 @@ function App() {
                 <select 
                   id="chat-mode-select"
                   value={chatMode}
-                  onChange={(e) => setChatMode(e.target.value as 'basic' | 'enhanced' | 'vercel')}
+                  onChange={(e) => setChatMode(e.target.value as 'basic' | 'enhanced' | 'vercel' | 'interpreter')}
                   className="rounded-lg bg-background border border-input px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   aria-label="Select Chat Mode"
                 >
                   <option value="basic">Basic Chat</option>
                   <option value="enhanced">Enhanced Chat</option>
                   <option value="vercel">Vercel AI SDK</option>
+                  <option value="interpreter">Code Interpreter</option>
                 </select>
               </div>
               <button
@@ -57,6 +59,7 @@ function App() {
           {chatMode === 'basic' && <Chat />}
           {chatMode === 'enhanced' && <EnhancedChat />}
           {chatMode === 'vercel' && <VercelEnhancedChat />}
+          {chatMode === 'interpreter' && <CodeInterpreterUI />}
         </main>
       </div>
     </ThemeProvider>
