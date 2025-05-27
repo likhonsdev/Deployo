@@ -81,7 +81,7 @@ I apologize, but I encountered an error while processing your request. Please tr
   }
 
   return (
-    <div className="flex h-[calc(100vh-200px)] flex-col rounded-lg border border-border bg-card shadow-sm">
+    <div className="flex h-[calc(100dvh-12rem)] sm:h-[calc(100dvh-8rem)] flex-col rounded-lg border border-border bg-card shadow-sm">
       <ChatMessages messages={messages} isLoading={isLoading} />
       <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
     </div>

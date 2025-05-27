@@ -93,7 +93,7 @@ export function EnhancedChat() {
   }, [messages])
   
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col overflow-hidden">
+    <div className="flex h-[calc(100dvh-12rem)] sm:h-[calc(100dvh-8rem)] flex-col overflow-hidden">
       <EnhancedChatMessages messages={messages} isLoading={isLoading} />
       <div className="border-t p-4">
         <ChatInput onSendMessage={handleStream} isLoading={isLoading} />

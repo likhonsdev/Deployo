@@ -24,7 +24,7 @@ export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
   }, [messages])
 
   return (
-    <div className="flex-1 overflow-y-auto p-4">
+    <div className="flex-1 overflow-y-auto p-2 sm:p-4">
       <div className="flex flex-col gap-6">
         {messages.map((message) => (
           <ChatMessage key={message.id} message={message} />

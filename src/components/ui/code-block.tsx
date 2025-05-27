@@ -31,7 +31,7 @@ export function CodeBlock({
   return (
     <div className="code-block">
       <div className="code-block-header">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
           {language && (
             <div className="rounded bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
               {language}

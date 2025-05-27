@@ -18,7 +18,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
   }
 
   return (
-    <div className="border-t border-border p-4">
+    <div className="border-t border-border p-2 sm:p-4">
       <form onSubmit={handleSubmit} className="flex gap-2">
         <textarea
           className={cn(
