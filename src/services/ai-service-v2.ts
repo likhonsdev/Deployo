@@ -1,5 +1,5 @@
 import {
-  GoogleGenAI,
+  GoogleGenerativeAI,
   GenerativeModel,
   GenerateContentStreamResult,
   Part
@@ -8,23 +8,8 @@ import { Message } from '../components/chat/ChatMessages'
 import { SYSTEM_PROMPT } from './system-prompt'
 import mime from 'mime'
 
-// Define a type for the content part with code execution properties
-interface ContentPartWithExecution extends Part {
-  executableCode?: string;
-  codeExecutionResult?: string;
-}
-
-// Type assertion helper
-function hasExecutableCode(part: Part): part is ContentPartWithExecution {
-  return (part as ContentPartWithExecution).executableCode !== undefined;
-}
-
-function hasCodeExecutionResult(part: Part): part is ContentPartWithExecution {
-  return (part as ContentPartWithExecution).codeExecutionResult !== undefined;
-}
-
 // Initialize the Google Generative AI
-const genAI = new GoogleGenAI(import.meta.env.VITE_GEMINI_API_KEY || '')
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '')
 
 // Define tools configuration
 const tools = [
@@ -51,13 +36,17 @@ export async function generateChatResponseStream(
       }))
 
     // Configure the model parameters for code execution
-    const modelConfig = {
+    const modelParams = {
+      model: 'gemini-2.5-pro-preview-05-06',
+      tools: tools, // tools should be part of modelParams
+    }
+
+    const generationConfig = {
       temperature: 2,
       topP: 0.3,
       topK: 64,
-      tools,
-      responseMimeType: 'text/plain',
       maxOutputTokens: 8192,
+      responseMimeType: 'text/plain', // responseMimeType should be part of generationConfig
     }
 
     // Create the user message
@@ -73,10 +62,20 @@ export async function generateChatResponseStream(
     }
 
     // Generate the response
-    return await genAI.models.generateContentStream({
-      model: 'gemini-2.5-pro-preview-05-06',
+    // Get the model instance
+    const model = genAI.getGenerativeModel(modelConfig.model);
+
+    // Generate the response
+    return await model.generateContentStream({
       contents: [systemInstruction, ...history, message],
-      generationConfig: modelConfig,
+      generationConfig: { // Pass generationConfig
+        temperature: modelConfig.temperature,
+        topP: modelConfig.topP,
+        topK: modelConfig.topK,
+        maxOutputTokens: modelConfig.maxOutputTokens,
+      },
+      tools: modelConfig.tools, // Pass tools as a top-level property
+      responseMimeType: modelConfig.responseMimeType, // Pass responseMimeType as a top-level property
     })
   } catch (error) {
     console.error('Error generating AI response:', error)
@@ -100,7 +99,7 @@ export async function processStreamingResponse(
   let fullResponse = ''
   
   try {
-    for await (const chunk of stream) {
+    for await (const chunk of stream.stream) {
       if (!chunk.candidates || !chunk.candidates[0]?.content) {
         continue
       }
@@ -146,7 +145,7 @@ export async function generateChatResponseComplete(
   const stream = await generateChatResponseStream(messageHistory, userMessage)
   let fullResponse = ''
   
-  for await (const chunk of stream) {
+  for await (const chunk of stream.stream) {
     if (!chunk.candidates || !chunk.candidates[0]?.content?.parts) {
       continue
     }

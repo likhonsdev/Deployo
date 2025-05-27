@@ -1,7 +1,7 @@
 'use client'; // Mark as Client Component
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { CodeInterpreter, InterpreterCommand, ProgrammingLanguage } from '../../services/code-interpreter-service';
+import { CodeInterpreter, InterpreterCommand } from '../../services/code-interpreter-service';
 import { exampleCategories, commandExamples } from '../../examples/python-examples';
 import { usePython } from 'react-py'; // Import usePython hook
 
