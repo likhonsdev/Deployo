@@ -97,7 +97,9 @@
 /* Enhanced responsive typography */
 @layer utilities {
   .text-balance {
-    text-wrap: balance;
+    /* text-wrap: balance; - removed due to compatibility issues with older browsers */
+    text-align: center; /* Alternative approach for text balancing */
+    max-width: 60ch; /* Limit line length for better readability */
   }
   
   .text-gradient {
@@ -108,9 +110,10 @@
     @apply from-primary to-accent;
   }
   
-  .not-prose {
-    @extend .prose;
+  /* Custom utility classes */
+  .code-wrapper {
     all: unset;
+    @apply font-mono;
   }
 }
 
@@ -120,12 +123,13 @@
 }
 
 .code-block {
-  @apply not-prose relative rounded-xl bg-muted font-mono text-sm;
+  @apply code-wrapper relative rounded-xl bg-muted font-mono text-sm;
 }
 
 .code-block pre {
   @apply overflow-x-auto py-4 max-w-full;
-  -webkit-overflow-scrolling: touch;
+  /* -webkit-overflow-scrolling: touch; - removed due to browser compatibility issues */
+  overflow-scrolling: auto; /* Standard property */
 }
 
 .code-block code {

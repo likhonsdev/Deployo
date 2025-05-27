@@ -2,7 +2,7 @@ import { Message } from '../components/chat/ChatMessages'
 import { SYSTEM_PROMPT } from './system-prompt'
 import { StreamingTextResponse } from '../lib/ai-utils'
 import { nanoid } from 'nanoid'
-import { CodeInterpreterService } from './code-interpreter-service'
+import { CodeInterpreter } from './code-interpreter-service'
 
 // Interface for Vercel AI SDK-compatible message
 export interface VercelAIMessage {
@@ -12,7 +12,55 @@ export interface VercelAIMessage {
 }
 
 // Initialize our code interpreter service
-const codeInterpreter = new CodeInterpreterService()
+const codeInterpreter = new CodeInterpreter()
+
+/**
+ * Process a message with the code interpreter
+ * This is a helper to maintain compatibility with the existing code
+ */
+async function processInterpreterMessage(message: string) {
+  // Simple regex to detect code blocks
+  const codeBlockRegex = /```([a-z]*)\n([\s\S]*?)```/;
+  const match = message.match(codeBlockRegex);
+  
+  if (match) {
+    // We have a code block
+    const language = match[1] || 'python';
+    const code = match[2].trim();
+    
+    // Execute the code
+    const result = await codeInterpreter.execute(code);
+    
+    return {
+      response: 'Code execution results:',
+      executionResult: {
+        language,
+        output: result.text || result.logs.stdout.join('\n') || 'No output'
+      }
+    };
+  }
+  
+  // Check if it's a command
+  if (message.trim().startsWith('/')) {
+    const parts = message.trim().split(' ');
+    const command = parts[0];
+    const args = parts.slice(1).join(' ');
+    
+    try {
+      const response = await codeInterpreter.handleCommand(command, args);
+      return {
+        response
+      };
+    } catch (error) {
+      return {
+        response: `Error: ${error instanceof Error ? error.message : String(error)}`
+      };
+    }
+  }
+  
+  // Not a code block or command
+  return { response: '' };
+}
 
 /**
  * Converts our internal message format to the format expected by Vercel AI
@@ -54,7 +102,7 @@ export async function generateVercelAIStream(
   userMessage: string
 ): Promise<Response> {
   // Process the message with our code interpreter
-  const interpreterResult = await codeInterpreter.processMessage(userMessage)
+  const interpreterResult = await processInterpreterMessage(userMessage)
   
   // If the message was handled by the interpreter (either as a command or code block)
   if (interpreterResult.response || interpreterResult.executionResult) {

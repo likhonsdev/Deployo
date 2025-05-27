@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { nanoid } from 'nanoid'
-import { motion, AnimatePresence } from '@/lib/animation-utils'
+import { motion, AnimatePresence } from '../../lib/animation-utils'
 import { ChatMessage } from './ChatMessage'
-import { ChatInput } from './ChatInput'
 import { Message } from './ChatMessages'
-import { useCustomChat } from '@/lib/ai-utils'
-import { convertToVercelMessages } from '@/services/ai-service-vercel'
+import { useCustomChat } from '../../lib/ai-utils'
 
 export function VercelEnhancedChat() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -16,16 +14,23 @@ export function VercelEnhancedChat() {
     input, 
     handleInputChange, 
     handleSubmit,
-    isLoading,
-    setInput
+    isLoading
   } = useCustomChat({
     api: '/api/chat', // API endpoint
+    initialMessages: messages, // Pass the current messages
     onResponse: (response: Response) => {
       // You can add custom handling here
       console.log('Chat response received', response)
     },
     onError: (error: Error) => {
       console.error('Error in chat:', error)
+      // Show error message to the user
+      const errorMessage: Message = {
+        id: nanoid(),
+        role: 'assistant',
+        content: 'Sorry, there was an error processing your request. Please try again.',
+      }
+      setMessages(prev => [...prev, errorMessage])
     },
     onFinish: (message: { content: string; role: string }) => {
       // Add the assistant's message to our state

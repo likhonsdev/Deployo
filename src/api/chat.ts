@@ -1,6 +1,6 @@
-import { StreamingTextResponse } from '@/lib/ai-utils'
+import { StreamingTextResponse } from '../lib/ai-utils'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { SYSTEM_PROMPT } from '@/services/system-prompt'
+import { SYSTEM_PROMPT } from '../services/system-prompt'
 
 // Define request type since we're not using Next.js types
 type Request = {
@@ -13,8 +13,8 @@ const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '')
 // Configure the API Handler
 export async function POST(req: Request) {
   try {
-    // Extract messages from the request
-    const { messages } = await req.json()
+    // Extract messages and input from the request
+    const { messages, input } = await req.json()
     
     // Create the formatted messages array
     const formattedMessages = []
@@ -33,6 +33,14 @@ export async function POST(req: Request) {
           parts: [{ text: message.content }]
         })
       }
+    }
+    
+    // Add the current user input as the final message
+    if (input) {
+      formattedMessages.push({
+        role: 'user',
+        parts: [{ text: input }]
+      })
     }
     
     // Configure the model parameters
