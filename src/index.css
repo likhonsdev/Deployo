@@ -107,6 +107,11 @@
   .primary-gradient {
     @apply from-primary to-accent;
   }
+  
+  .not-prose {
+    @extend .prose;
+    all: unset;
+  }
 }
 
 /* Custom styles for the application */
