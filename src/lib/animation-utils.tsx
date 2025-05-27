@@ -33,8 +33,9 @@ const createMotionComponent = (Component: string) => {
 };
 
 /**
- * Simplified motion object with just div for now
+ * Simplified motion object with commonly used components
  */
 export const motion = {
   div: createMotionComponent('div'),
+  header: createMotionComponent('header')
 };
